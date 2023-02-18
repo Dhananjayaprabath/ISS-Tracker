@@ -1,0 +1,164 @@
+<html>
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+        <title>ISS Tracker</title>
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+   integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+   crossorigin=""/>
+<link rel="stylesheet" href="style.css"/>
+  
+
+<nav class=" navbar fixed-top navbar bg-light" >
+  
+  <div class="container-fluid" >
+    <a class="navbar-brand" href="#">
+      <img src="isslogo.png" alt="Logo" width="20" height="15" class="d-inline-block align-text-top">
+      ISS Tracker
+    </a>
+  </div>
+
+</nav>
+
+
+
+ </head>
+<body>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+<div class="ind">
+    <p class="det">ISS Tracker Provide live location in international space station location .we use public api for track ISS .</p>
+</div>
+
+    <div class="container">
+        <div class="row">
+          <div class="column-66">
+            <div id="map"></div>
+          </div>
+          <div class="column-33">
+
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Latitude
+                <span id="lat" class="badge bg-primary rounded-pill"></span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Longitude
+                <span id="log" class="badge bg-primary rounded-pill"></span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Velocity
+                <span id="vel" class="badge bg-primary rounded-pill"></span>
+              </li>
+
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Altitude
+                <span id="apt" class="badge bg-primary rounded-pill"></span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                visibility
+                <span id="visi" class="badge bg-primary rounded-pill"></span>
+              </li>
+
+             
+            </ul>
+
+           
+          
+          </div>
+        </div>
+      </div>
+
+  
+
+       
+
+        <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+   integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+   crossorigin=""></script>
+<script>
+   var myIcon = L.icon({
+    iconUrl: 'isslogo.png',
+    iconSize: [50, 32],
+    iconAnchor: [25, 16],
+    popupAnchor: [0, 0],
+   }
+    );
+
+
+var circles = L.circle( {
+    color: 'red',
+    fillColor: '#f03',
+    fillOpacity: 0.5,
+    radius: 500
+});
+
+    var map = L.map('map').setView([0, 0], 1);
+    const marker =L.marker([0,0],{icon: myIcon},{circle:circles}).addTo(map);
+   
+  
+  
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+}).addTo(map);
+
+   
+const api_url ='https://api.wheretheiss.at/v1/satellites/25544';
+
+let firstTime =true;
+
+async function getISS(){
+    const response =await fetch(api_url);
+    const data =await response.json();
+    
+    const{latitude ,longitude,velocity,altitude,visibility,timestamp}= data;
+
+  
+ 
+
+
+    marker.setLatLng([latitude, longitude]);
+    marker.bindPopup (velocity+" kmp\h");
+
+    map.setView ([latitude,longitude]);
+
+    if (firstTime){
+    map.setView ([latitude,longitude],2);
+    firstTime =false;
+    }
+
+    var time = timestamp
+  var date = time*1000;
+  var date_ob = new Date(date);
+  
+  
+
+
+    document.getElementById('lat').textContent=latitude;
+    document.getElementById('log').textContent=longitude;
+    document.getElementById('vel').textContent=velocity;
+    document.getElementById('apt').textContent=altitude+" Km";
+    document.getElementById('visi').textContent=visibility;
+    document.getElementById('dates').textContent=date_ob;
+    
+}
+
+getISS(); 
+setInterval(getISS,1000);
+
+</script>
+
+<div class="footer">
+<p class="footertrx">Develop by DCODE</p>
+</div>
+    </body>
+</html>
